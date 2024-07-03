@@ -1,86 +1,116 @@
-.background-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
+/* Variables */
+:root {
+    --primary-color: #007bff;
+    --primary-color-dark: #0056b3;
+    --primary-color-light: #004085;
+    --secondary-color: #6c757d;
+    --text-color: #333;
+    --background-color: #f8f9fa;
+    --border-radius: 10px;
+    --box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Container Styling */
+  .user-details-container {
+    padding: 20px;
+  }
+  
+  .user-card {
+    background-color: var(--background-color);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+    color: var(--text-color);
+    transition: transform 0.3s, box-shadow 0.3s;
   }
   
-  .background-image {
-    position: absolute;
+  .user-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-card .card-body {
+    padding: 20px;
+  }
+  
+  .user-card .card-title {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+  }
+  
+  .user-details-list {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  
+  .user-details-list li {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: var(--text-color);
+  }
+  
+  .profile-picture {
+    display: block;
     width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background-size: cover;
-    background-position: center;
-    z-index: -1;
-  }
-  
-  .blur-effect {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    z-index: -1;
-  }
-  
-  .container {
-    position: relative;
-    z-index: 1;
-    color: #fff;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
+    height: auto;
   }
   
   .btn-primary {
-    margin-top: 20px;
+    display: block;
+    width: 100%;
     padding: 10px 20px;
     font-size: 1rem;
-    background-color: #007bff;
+    background-color: var(--primary-color);
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     color: #fff;
     transition: background-color 0.3s, transform 0.3s;
   }
   
   .btn-primary:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-color-dark);
   }
   
   .btn-primary:active {
-    background-color: #004085;
+    background-color: var(--primary-color-light);
     transform: scale(0.98);
   }
   
   /* Responsive Styles */
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 2rem;
+  @media (max-width: 992px) {
+    .user-card .card-title {
+      font-size: 1.25rem;
+    }
+  
+    .user-details-list li {
+      font-size: 0.9rem;
     }
   
     .btn-primary {
-      width: 100%;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .user-card .card-title {
       font-size: 1rem;
+    }
+  
+    .user-details-list li {
+      font-size: 0.85rem;
+    }
+  
+    .btn-primary {
+      font-size: 0.85rem;
     }
   }
   
   @media (max-width: 576px) {
-    h1 {
-      font-size: 1.5rem;
-    }
-  
-    .btn-primary {
-      width: 100%;
+    .user-card .card-title {
       font-size: 0.9rem;
     }
-  }
+  
   
