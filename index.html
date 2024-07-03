@@ -11,9 +11,9 @@
         <div class="background-image" style="background-image: url('/assets/OIP.jpg');"></div>
         <div class="blur-effect"></div>
         <div class="container">
-          <div class="row justify-content-center">
+          <div class="row justify-content-center align-items-center vh-100">
             <div class="col-md-6 col-lg-4">
-              <div class="card login-card">
+              <div class="card login-card animate__animated animate__fadeIn">
                 <div class="card-body">
                   <h2 class="card-title text-center">Login</h2>
                   <form>
@@ -25,9 +25,9 @@
                       <label for="password">Password:</label>
                       <input type="password" class="form-control" id="password" name="password" [(ngModel)]="loginForm.password">
                     </div>
-                    <button class="btn btn-primary btn-block" (click)="login()">Login</button>
+                    <button type="button" class="btn btn-primary btn-block animate__animated animate__pulse" (click)="login()">Login</button>
                   </form>
-                  <div class="login-to-register text-center" (click)="navigateTo('/register')">Don't have an account? Register</div>
+                  <div class="login-to-register text-center mt-3" (click)="navigateTo('/register')">Don't have an account? Register</div>
                 </div>
               </div>
             </div>
@@ -35,8 +35,5 @@
         </div>
       </div>
       
-      
-      
-    
 </body>
 </html>
