@@ -49,7 +49,7 @@
 }
 
 /* Card Styling */
-.login-card {
+.register-card {
   background-color: var(--background-color);
   border: none;
   border-radius: var(--border-radius);
@@ -57,11 +57,11 @@
   padding: 20px;
 }
 
-.login-card .card-body {
+.register-card .card-body {
   position: relative;
 }
 
-.login-card .card-title {
+.register-card .card-title {
   font-size: 2rem;
   color: var(--primary-color);
   margin-bottom: 20px;
@@ -138,7 +138,7 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-  .login-card .card-title {
+  .register-card .card-title {
     font-size: 1.5rem;
   }
 
@@ -152,7 +152,7 @@
 }
 
 @media (max-width: 576px) {
-  .login-card .card-title {
+  .register-card .card-title {
     font-size: 1.25rem;
   }
 
