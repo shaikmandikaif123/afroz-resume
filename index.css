@@ -43,6 +43,22 @@
   
   .btn-primary {
     margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  .btn-primary:active {
+    background-color: #004085;
+    transform: scale(0.98);
   }
   
   /* Responsive Styles */
@@ -53,6 +69,7 @@
   
     .btn-primary {
       width: 100%;
+      font-size: 1rem;
     }
   }
   
@@ -63,6 +80,7 @@
   
     .btn-primary {
       width: 100%;
+      font-size: 0.9rem;
     }
   }
   
