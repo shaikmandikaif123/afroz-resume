@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./index.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container user-details-container">
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card user-card">
+              <img src="/assets/th.jpg" alt="User Profile Picture" class="card-img-top profile-picture">
+              <div class="card-body">
+                <h5 class="card-title">User Details</h5>
+                <ul class="user-details-list">
+                  <li><strong>ID:</strong> {{ userDetails.id }}</li>
+                  <li><strong>Phone Number:</strong> {{ userDetails.phoneNumber }}</li>
+                  <li><strong>First Name:</strong> {{ userDetails.firstName }}</li>
+                  <li><strong>Last Name:</strong> {{ userDetails.lastName }}</li>
+                  <li><strong>Email:</strong> {{ userDetails.email }}</li>
+                  <li><strong>Age:</strong> {{ userDetails.age }}</li>
+                </ul>
+                <button class="btn btn-primary" (click)="applyForCreditCard()">Apply For Credit Card</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+    
+</body>
+</html>
