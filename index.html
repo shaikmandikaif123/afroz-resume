@@ -4,39 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./index.css">
+    
     <title>Document</title>
 </head>
 <body>
-    <div class="container">
-        <h1 class="dashboard-title">Admin Dashboard</h1>
-        <div class="row">
-          <div class="col-md-6 col-lg-4" *ngFor="let user of users">
-            <div class="card user-card animate__animated animate__fadeIn">
-              <div class="card-body">
-                <h5 class="card-title">{{ user.firstName }} {{ user.lastName }}</h5>
-                <p><strong>User ID:</strong> {{ user.id }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Age:</strong> {{ user.age }}</p>
-                <p><strong>Phone Number:</strong> {{ user.phoneNumber }}</p>
-                <p><strong>Credit Score:</strong> {{ user.creditCardApplication.creditScore }}</p>
-                <p><strong>Income:</strong> {{ user.creditCardApplication.income }}</p>
-                <p><strong>Employment Status:</strong> {{ user.creditCardApplication.employmentStatus }}</p>
-                <p><strong>Debt to Income Ratio:</strong> {{ user.creditCardApplication.debtToIncomeRatio }}</p>
-                <p><strong>Status:</strong> {{ user.status }}</p>
-                <div class="actions">
-                  <select #statusSelect class="form-select">
-                    <option value="APPROVED">Approved</option>
-                    <option value="REJECTED">Rejected</option>
-                    <option value="PENDING">Pending</option>
-                  </select>
-                  <button class="btn btn-primary" (click)="changeStatus(user, statusSelect)">Update Status</button>
-                </div>
+
+      <div class="background-container">
+          <div class="background-image" style="background-image: url('/assets/OIP.jpg');"></div>
+          <div class="blur-effect"></div>
+          <div class="container">
+              <div class="гон">
+                  <div class="wrapper">
+                      <form>
+                          <h2>Login</h2>
+                          <div class="form-group input-box">
+                              <label for="phoneNumber">Phone Number: </label>
+                              <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="phoneNumber" required>
+                              <i class='bx bxs-user'></i>
+                          </div>
+                          <div class="form-group input-box">
+                              <label for="password">Password: </label>
+                              <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                              <i class='bx bxs-lock-alt'></i>
+                          </div>
+                        
+                          <button type="submit" class="btn btn-primary">Login</button>
+                          <div class="login-to-register register-link">
+                              <p>Don't have an account? <a href="#">Register</a></p>
+                          </div>
+                      </form>
+                  </div>
               </div>
-            </div>
           </div>
-        </div>
       </div>
-      
+  
+  
       
       
       
