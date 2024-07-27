@@ -1,0 +1,20 @@
+it('should call login with valid form', () => {
+  const form: NgForm = {
+    valid: true,
+  } as NgForm;
+  const loginForm: LoginRequest = {
+    phoneNumber: '123',
+    password: 'pass',
+  };
+  component.loginForm = loginForm;
+  const loginSpy = jest.spyOn(userService, 'login').mockReturnValue(of({
+    id: '1',
+    phoneNumber: '123',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    age: 30
+  }));
+  component.Login(form);
+  expect(loginSpy).toHaveBeenCalledTimes(1);
+});
