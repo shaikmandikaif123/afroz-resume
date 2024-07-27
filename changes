@@ -1,44 +1,89 @@
-it('should call login with valid form', () => {
-  const form: NgForm = {
-    valid: true,
-    submitted: false,
-    controls: {
-      phoneNumber: {
-        touched: true,
-        valid: true,
-      },
-      password: {
-        touched: true,
-        valid: true,
-      },
-    },
-    directives: [],
-    form: {
-      resetForm: jest.fn(),
-      get: jest.fn(),
-      addControl: jest.fn(),
-      removeControl: jest.fn(),
-      getControls: jest.fn(),
-      addFormGroup: jest.fn(),
-      removeFormGroup: jest.fn(),
-      getFormGroup: jest.fn(),
-    },
-  } as NgForm;
-  const loginForm: LoginRequest = {
-    phoneNumber: '123',
-    password: 'pass',
-  };
-  component.loginForm = loginForm;
-  const loginSpy = jest.spyOn(userService, 'login').mockReturnValue(of({
-    id: '1',
-    phoneNumber: '123',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    age: 30
-  }));
-  fixture.detectChanges(); // Ensure the component is updated
-  component.Login(form);
-  expect(loginSpy).toHaveBeenCalledTimes(1); // Expect the mock function to be called once
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { of, throwError } from 'rxjs';
+
+import { LoginComponent } from './login.component';
+import { UserService } from '../Services/user.service';
+import { UserDetails, LoginRequest } from '../user.model';
+
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+  let mockUserService: UserService;
+  let mockRouter: Router;
+
+  beforeEach(async () => {
+    mockUserService = {
+      login: jest.fn(),
+    } as unknown as UserService;
+
+    mockRouter = {
+      navigate: jest.fn()
+    } as unknown as Router;
+
+    await TestBed.configureTestingModule({
+      declarations: [LoginComponent],
+      imports: [FormsModule],
+      providers: [
+        { provide: UserService, useValue: mockUserService },
+        { provide: Router, useValue: mockRouter }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should call login on form submit if form is valid', () => {
+    const form = {
+      valid: true
+    } as NgForm;
+
+    component.loginForm = { phoneNumber: '1234567890', password: 'password' };
+    const userDetails: UserDetails = { id: '1' };
+    mockUserService.login = jest.fn().mockReturnValue(of(userDetails));
+
+    component.Login(form);
+
+    expect(mockUserService.login).toHaveBeenCalledWith(component.loginForm);
+    expect(localStorage.setItem).toHaveBeenCalledWith('id', userDetails.id);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/user-details']);
+  });
+
+  it('should not call login if form is invalid', () => {
+    const form = {
+      valid: false
+    } as NgForm;
+
+    component.Login(form);
+
+    expect(mockUserService.login).not.toHaveBeenCalled();
+  });
+
+  it('should handle login error', () => {
+    const form = {
+      valid: true
+    } as NgForm;
+
+    mockUserService.login = jest.fn().mockReturnValue(throwError(() => new Error('Login failed')));
+    jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    component.Login(form);
+
+    expect(mockUserService.login).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledWith(expect.any(Error));
+    expect(window.alert).toHaveBeenCalledWith('Login failed...phoneNumber or password may be wrong');
+  });
+
+  it('should navigate to register on navigateTo call', () => {
+    component.navigateTo();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/register']);
+  });
 });
 
