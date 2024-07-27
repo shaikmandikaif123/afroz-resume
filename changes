@@ -1,6 +1,28 @@
 it('should call login with valid form', () => {
   const form: NgForm = {
     valid: true,
+    submitted: false,
+    controls: {
+      phoneNumber: {
+        touched: true,
+        valid: true,
+      },
+      password: {
+        touched: true,
+        valid: true,
+      },
+    },
+    directives: [],
+    form: {
+      resetForm: jest.fn(),
+      get: jest.fn(),
+      addControl: jest.fn(),
+      removeControl: jest.fn(),
+      getControls: jest.fn(),
+      addFormGroup: jest.fn(),
+      removeFormGroup: jest.fn(),
+      getFormGroup: jest.fn(),
+    },
   } as NgForm;
   const loginForm: LoginRequest = {
     phoneNumber: '123',
@@ -15,6 +37,8 @@ it('should call login with valid form', () => {
     email: 'john.doe@example.com',
     age: 30
   }));
+  fixture.detectChanges(); // Ensure the component is updated
   component.Login(form);
-  expect(loginSpy).toHaveBeenCalledTimes(1);
+  expect(loginSpy).toHaveBeenCalledTimes(1); // Expect the mock function to be called once
 });
+
