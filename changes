@@ -43,18 +43,13 @@ describe('LoginComponent', () => {
   it('should call login on form submit if form is valid', () => {
     const form = {
       valid: true,
-      touched: true,
+      value: component.loginForm,
       controls: {
-        phoneNumber: {
-          valid: true
-        },
-        password: {
-          valid: true
-        }
+        phoneNumber: { valid: true, touched: true },
+        password: { valid: true, touched: true }
       }
     } as unknown as NgForm;
 
-    component.loginForm = { phoneNumber: '1234567890', password: 'password' };
     const userDetails: UserDetails = { id: '1' };
     mockUserService.login = jest.fn().mockReturnValue(of(userDetails));
 
@@ -68,14 +63,10 @@ describe('LoginComponent', () => {
   it('should not call login if form is invalid', () => {
     const form = {
       valid: false,
-      touched: true,
+      value: component.loginForm,
       controls: {
-        phoneNumber: {
-          valid: false
-        },
-        password: {
-          valid: false
-        }
+        phoneNumber: { valid: false, touched: true },
+        password: { valid: false, touched: true }
       }
     } as unknown as NgForm;
 
@@ -87,14 +78,10 @@ describe('LoginComponent', () => {
   it('should handle login error', () => {
     const form = {
       valid: true,
-      touched: true,
+      value: component.loginForm,
       controls: {
-        phoneNumber: {
-          valid: true
-        },
-        password: {
-          valid: true
-        }
+        phoneNumber: { valid: true, touched: true },
+        password: { valid: true, touched: true }
       }
     } as unknown as NgForm;
 
