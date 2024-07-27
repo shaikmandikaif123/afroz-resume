@@ -1,42 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./index.css">
-    
-    <title>Document</title>
-</head>
-<body>
+import { TestBed } from '@angular/core/testing';
+import { LoginComponent } from './login.component';
+import { UserService } from '../Services/user.service';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 
-  <div class="wrapper">
-    <h1>Login</h1>
-    <form #loginForm="ngForm" (ngSubmit)="login()">
-        <div class="input-box form-group">
-            <label for="phoneNumber" style="display: none;">Phone Number:</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Username" [(ngModel)]="loginForm.phoneNumber" required>
-            <i class='bx bxs-user'></i>
-        </div>
-        <div *ngIf="loginForm.controls.phoneNumber?.invalid && loginForm.controls.phoneNumber?.touched" class="error">
-            Username is required.
-        </div>
-        <div class="input-box form-group">
-            <label for="password" style="display: none;">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Password" [(ngModel)]="loginForm.password" required>
-            <i class='bx bxs-lock-alt'></i>
-        </div>
-        <div *ngIf="loginForm.controls.password?.invalid && loginForm.controls.password?.touched" class="error">
-            Password is required.
-        </div>
-        
-        <button type="submit" class="btn" [disabled]="loginForm.invalid">Login</button>
-        <div class="register-link">
-            <p>Don't have an account? <a href="#" (click)="navigateTo('/register')">Register</a></p>
-        </div>
-    </form>
-</div>
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+  let userService: UserService;
+  let router: Router;
 
-      
-      
-</body>
-</html>
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [LoginComponent],
+      imports: [FormsModule],
+      providers: [
+        {
+          provide: UserService,
+          useValue: {
+            login: jest.fn(), // Mock the login function
+          },
+        },
+        {
+          provide: Router,
+          useValue: {
+            navigate: jest.fn(),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    userService = TestBed.inject(UserService);
+    router = TestBed.inject(Router);
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('Login method', () => {
+    it('should call login with valid form', () => {
+      const form: NgForm = {
+        valid: true,
+      } as NgForm;
+      const loginForm: LoginRequest = {
+        phoneNumber: '123',
+        password: 'pass',
+      };
+      component.loginForm = loginForm;
+      const loginSpy = jest.spyOn(userService, 'login'); // Create a spy for the login method
+      component.Login(form); // Call the method that contains the mock function
+      expect(loginSpy).toHaveBeenCalledTimes(1); // Now this expectation should pass
+    });
+
+    it('should show alert with invalid form', () => {
+      const form: NgForm = {
+        valid: false,
+      } as NgForm;
+      window.alert = jest.fn();
+      component.Login(form);
+      expect(window.alert).toHaveBeenCalledTimes(1);
+      expect(window.alert).toHaveBeenCalledWith(
+        'Login failed...phoneNumber or password may be wrong'
+      );
+    });
+  });
+
+  describe('navigateTo method', () => {
+    it('should navigate to register page', () => {
+      component.navigateTo();
+      expect(router.navigate).toHaveBeenCalledTimes(1);
+      expect(router.navigate).toHaveBeenCalledWith(['/register']);
+    });
+  });
+});
