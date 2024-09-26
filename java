@@ -176,3 +176,44 @@ public class Calculator {
 }
 
 
+
+
+
+
+
+
+
+package org.example;
+
+import org.example.Abstraction.ApplicationStatusManager;
+import org.example.Inheritance.PremiumCardApplication;
+import org.example.Inheritance.StandardCardApplication;
+import org.example.composition.Address;
+import org.example.composition.ContactInfo;
+
+
+public class CreditCardSystem {
+    public static void main(String[] args) {
+        // User and Address (Composition Example)
+        Address userAddress = new Address("RCT", "Kadapa", "516269");
+        ContactInfo userContacts = new ContactInfo("9121205990","kaif@gmail.com");
+        User customer = new User("Kaif", userAddress,userContacts);
+        System.out.println(customer.getUserDetails());
+        System.out.println(customer.getContsctDetails());
+
+        // Inheritance and Polymorphism Example
+        CreditCardApplication standardApplication = new StandardCardApplication("Kaif", 30000);
+        CreditCardApplication premiumApplication = new PremiumCardApplication("Kaif", 50000);
+
+        standardApplication.approveApplication();  // Approval based on income
+        premiumApplication.approveApplication();  // Special conditions for premium card
+
+        // Abstract class example for Admin
+        ApplicationStatusManager adminManager = new AdminStatusManager();
+
+        adminManager.approveApplication();  // Admin approval
+    }
+
+}
+
+
