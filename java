@@ -67,3 +67,38 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     { "id": 3, "name": "Sanction and Embargo", "code": "SACTION_AND_EMBARGO" }
   ]
 }
+
+
+
+@Test
+void should_return_emptyList_when_inputList_is_empty() throws IOException {
+    // Given
+    List<String> escalationTypesResult = Collections.emptyList();
+
+    // Create expected ComplianceResponseInfo object
+    ComplianceResponseInfo expected = ComplianceResponseInfo.builder()
+            .status("APPROVED")
+            .attachment(ComplianceResponseAttachment.builder()
+                    .id(1L)
+                    .name("filename.pdf")
+                    .build())
+            .comment("comment")
+            .escalationNecessary(true)
+            .escalationTypes(escalationTypesResult)
+            .build();
+
+    // Read escalation types from JSON file
+    String jsonFilePath = "src/test/resources/escalationTypes.json";
+    ObjectMapper objectMapper = new ObjectMapper();
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(jsonFilePath), EscalationTypes.class);
+
+    // Mock the API call
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // When
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+    // Then
+    assertEquals(escalationTypesResult, result);
+}
