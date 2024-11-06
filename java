@@ -57,3 +57,13 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     // Then
     assertEquals(expectedResult, result);
 }
+
+
+
+{
+  "escalationTypes": [
+    { "id": 1, "name": "AML", "code": "AML" },
+    { "id": 2, "name": "CSR", "code": "CSR" },
+    { "id": 3, "name": "Sanction and Embargo", "code": "SACTION_AND_EMBARGO" }
+  ]
+}
