@@ -102,3 +102,38 @@ void should_return_emptyList_when_inputList_is_empty() throws IOException {
     // Then
     assertEquals(escalationTypesResult, result);
 }
+
+
+
+
+
+
+@Test
+void should_return_emptyList_when_inputList_is_null() throws IOException {
+    // Given
+    ComplianceResponseInfo expected = ComplianceResponseInfo.builder()
+            .status("APPROVED")
+            .attachment(ComplianceResponseAttachment.builder()
+                    .id(1L)
+                    .name("filename.pdf")
+                    .build())
+            .comment("comment")
+            .escalationNecessary(true)
+            .escalationTypes(null) // Input list is null
+            .build();
+
+    // Read escalation types from JSON file
+    String jsonFilePath = "src/test/resources/escalationTypes.json";
+    ObjectMapper objectMapper = new ObjectMapper();
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(jsonFilePath), EscalationTypes.class);
+
+    // Mock the API call
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // When
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+    // Then
+    assertThat(result).isEmpty();
+}
