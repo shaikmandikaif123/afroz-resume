@@ -9,3 +9,14 @@ public List<String> getEscalationTypesFromComplianceSummary(List<String> selecte
                     .collect(Collectors.toList()))
             .orElse(Collections.emptyList());
 }
+
+
+return Optional.ofNullable(this.tradeFinanceComplianceClient.getEscalationTypes())
+        .map(ResponseEntity::getBody)
+        .map(body -> ((ComplianceSummary) body).getEscalationTypes()) // Cast if necessary
+        .filter(escalationTypes -> ObjectUtils.isNotEmpty(selectedEscalationTypeCodes))
+        .map(escalationTypes -> escalationTypes.stream()
+                .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
+                .map(EscalationType::getName)
+                .collect(Collectors.toList()))
+        .orElse(Collections.emptyList());
