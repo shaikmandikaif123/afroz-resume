@@ -84,6 +84,9 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     ObjectMapper objectMapper = new ObjectMapper();
     ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
 
+    // Print expected escalation types for debugging
+    System.out.println("Expected Escalation Types: " + expected.getEscalationTypes());
+
     // Mock the response to return the deserialized escalationTypes object
     String escalationTypesJsonPath = "src/test/resources/compliancesummary/escalation-types.json";
     EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonPath), EscalationTypes.class);
@@ -92,6 +95,10 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
 
     // When
     List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+    // Print actual result for debugging
+    System.out.println("Actual Result: " + result);
+
     List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
 
     // Then
