@@ -23,3 +23,17 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     // Then
     assertEquals(expectedResult, result);
 }
+
+
+
+
+{
+  "status": "APPROVED",
+  "attachment": {
+    "id": 1,
+    "name": "Alename.pdf"
+  },
+  "comment": "comment",
+  "escalationNecessary": true,
+  "escalationTypes": ["AML", "CSR", "SANCTION_AND_EMBARGO"]
+}
