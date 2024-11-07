@@ -1,0 +1,25 @@
+@Test
+void should_return_list_of_all_the_selected_escalation_types() throws IOException {
+    // Given
+    String complianceResponseJsonFilePath = "src/test/resources/compliancesummary/expected-compliance-response-info.json";
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    // Read `ComplianceResponseInfo` from JSON
+    ComplianceResponseInfo expected = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
+
+    // Read escalation types from JSON
+    String escalationTypesJsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
+
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // Expected result (mock data) moved under Given
+    List<String> expectedResult = Arrays.asList("AML", "CSR", "SANCTION_AND_EMBARGO");
+
+    // When
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+    // Then
+    assertEquals(expectedResult, result);
+}
