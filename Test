@@ -24,3 +24,50 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     // Then
     assertEquals(expectedResult, result);
 }
+
+
+
+
+@Test
+void should_return_list_of_all_the_selected_escalation_types() throws IOException {
+
+    // Given: Prepare the expected response object from the JSON file
+    String jsonFilePath = "src/test/resources/compliancesummary/compliance-response-info.json";
+    ObjectMapper objectMapper = new ObjectMapper();
+    
+    // Read ComplianceResponseInfo from the JSON file
+    ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
+    
+    // Mock data for escalation types
+    String escalationTypesJsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    
+    // Mocking the service response
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+    
+    // Expected result (moved to Given section)
+    List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
+
+    // When: Call the method under test
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+    
+    // Then: Verify the result matches the expected list of escalation types
+    assertEquals(expectedResult, result);
+}
+
+
+{
+  "status": "APPROVED",
+  "attachment": {
+    "id": 1,
+    "name": "filename.pdf"
+  },
+  "comment": "comment",
+  "escalationNecessary": true,
+  "escalationTypes": [
+    { "id": 1, "name": "AML", "code": "AML" },
+    { "id": 2, "name": "CSR", "code": "CSR" },
+    { "id": 3, "name": "Sanction and Embargo", "code": "SACTION_AND_EMBARGO" }
+  ]
+}
