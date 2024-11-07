@@ -71,3 +71,29 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     { "id": 3, "name": "Sanction and Embargo", "code": "SACTION_AND_EMBARGO" }
   ]
 }
+
+
+
+@Test
+void should_return_list_of_all_the_selected_escalation_types() throws IOException {
+
+    // Given
+    String jsonFilePath = "src/test/resources/compliancesummary/compliance-response-info.json";
+
+    // Use ObjectMapper to deserialize the JSON file into ComplianceResponseInfo
+    ObjectMapper objectMapper = new ObjectMapper();
+    ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
+
+    // Mock the response to return the deserialized escalationTypes object
+    String escalationTypesJsonPath = "src/test/resources/compliancesummary/escalation-types.json";
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonPath), EscalationTypes.class);
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // When
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+    List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
+
+    // Then
+    assertEquals(expectedResult, result);
+}
