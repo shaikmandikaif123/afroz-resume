@@ -130,3 +130,49 @@ void should_return_list_of_all_the_selected_escalation_types() throws IOExceptio
     // Then
     assertEquals(expectedResult, result);
 }
+
+
+
+
+
+
+
+
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.util.CollectionUtils;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+public class TradefinanceComplianceClientService implements TradeFinanceComplianceClientService {
+
+    private final TradeFinanceComplianceClient tradeFinanceComplianceClient;
+
+    // Constructor injection for better testability and immutability
+    public TradefinanceComplianceClientService(TradeFinanceComplianceClient tradeFinanceComplianceClient) {
+        this.tradeFinanceComplianceClient = tradeFinanceComplianceClient;
+    }
+
+    @Override
+    @Cacheable(cacheNames = ESCALATION_TYPES_CACHE_NAME)
+    public List<String> getEscalationTypesFromComplianceSummary(List<String> selectedEscalationTypeCodes) {
+        // Validate input early
+        if (CollectionUtils.isEmpty(selectedEscalationTypeCodes)) {
+            return Collections.emptyList();
+        }
+
+        // Fetch escalation types from the client and handle nulls safely
+        return Optional.ofNullable(tradeFinanceComplianceClient.getEscalationTypes())
+                .map(ResponseEntity::getBody) // Check if the response body is not null
+                .map(EscalationTypes::getEscalationTypes) // Check if the `EscalationTypes` contains the list
+                .filter(escalationTypes -> !CollectionUtils.isEmpty(escalationTypes)) // Filter out if the list is null or empty
+                .map(escalationTypes -> escalationTypes.stream()
+                        .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode())) // Match selected codes
+                        .map(EscalationType::getName) // Extract names
+                        .collect(Collectors.toList()) // Collect into a list
+                )
+                .orElse(Collections.emptyList()); // Fallback if any part of the chain returns null or empty
+    }
+}
