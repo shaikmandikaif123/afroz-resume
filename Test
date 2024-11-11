@@ -210,3 +210,39 @@ void should_return_list_of_filtered_selected_escalation_types() throws IOExcepti
     // Then
     assertEquals(expectedResult, result);
 }
+
+
+
+
+
+@Test
+void should_return_list_of_all_the_selected_escalation_types() throws IOException {
+    // Initialize ObjectMapper for reading JSON
+    ObjectMapper objectMapper = new ObjectMapper();
+
+    // Read ComplianceResponseInfo from JSON for input
+    String complianceResponseJsonFilePath = "src/test/resources/complianceResponseInfo.json";
+    ComplianceResponseInfo complianceResponseInfo = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
+    List<String> selectedEscalationTypeCodes = complianceResponseInfo.getEscalationTypes();
+
+    // Read escalation types from JSON for mock response
+    String escalationTypesJsonFilePath = "src/test/resources/escalationTypes.json";
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
+
+    // Mock the response from tradeFinanceComplianceClient
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // Call the method under test
+    List<String> result = tradefinanceComplianceClientCacheService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
+
+    // Construct the expected result by filtering escalation types based on selected codes
+    List<String> expectedResult = escalationTypes.getEscalationTypes()
+            .stream()
+            .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
+            .map(EscalationType::getName)
+            .collect(Collectors.toList());
+
+    // Assert the result matches the expected result
+    assertEquals(expectedResult, result);
+}
