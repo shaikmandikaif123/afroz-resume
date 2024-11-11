@@ -45,3 +45,30 @@ public class TradefinanceComplianceClientCacheServiceTest {
         assertEquals(Arrays.asList("Type 1", "Type 3"), result);
     }
 }
+@Test
+public void should_return_empty_list_when_escalation_types_are_null() throws IOException {
+    // Given
+    ComplianceResponseInfo expected = ComplianceResponseInfo.builder()
+            .status("APPROVED")
+            .attachment(ComplianceResponseAttachment.builder()
+                    .id(1L)
+                    .name("filename.pdf")
+                    .build())
+            .comment("comment")
+            .escalationNecessary(true)
+            .escalationTypes(null)  // Simulating null escalation types
+            .build();
+
+    String jsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
+    ObjectMapper objectMapper = new ObjectMapper();
+    EscalationTypes escalationTypes = objectMapper.readValue(new File(jsonFilePath), EscalationTypes.class);
+
+    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
+    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+    // When
+    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+    // Then
+    assertThat(result).isEmpty();
+}
