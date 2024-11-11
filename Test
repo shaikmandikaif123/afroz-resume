@@ -99,3 +99,90 @@ public List<String> getEscalationTypesFromComplianceSummary(List<String> selecte
             .map(EscalationType::getName)
             .collect(Collectors.toList());
 }
+
+
+@Cacheable(cacheNames = ESCALATION_TYPES_CACHE_NAME)
+public List<String> getEscalationTypesFromComplianceSummary(List<String> selectedEscalationTypeCodes) {
+    return Optional.ofNullable(selectedEscalationTypeCodes)
+            .filter(codes -> !codes.isEmpty())
+            .map(codes -> tradeFinanceComplianceClient.getEscalationTypes())
+            .filter(responseEntity -> responseEntity != null && responseEntity.getBody() != null)
+            .map(responseEntity -> responseEntity.getBody())
+            .map(EscalationTypes::getEscalationTypes)
+            .filter(escalationTypes -> !escalationTypes.isEmpty())
+            .map(escalationTypes -> escalationTypes.stream()
+                    .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
+                    .map(EscalationType::getName)
+                    .collect(Collectors.toList()))
+            .orElse(Collections.emptyList());
+}
+
+
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
+
+public class ComplianceServiceTest {
+
+    @Mock
+    private TradeFinanceComplianceClient tradeFinanceComplianceClient;
+
+    @InjectMocks
+    private ComplianceService complianceService;
+
+    private ObjectMapper objectMapper;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        objectMapper = new ObjectMapper();
+    }
+
+    @Test
+    public void testGetEscalationTypesFromComplianceSummary_selectedCodeMatches() throws IOException {
+        // Read test data from JSON file
+        File jsonFile = new File("src/test/resources/test-data.json");
+        TestData testData = objectMapper.readValue(jsonFile, TestData.class);
+
+        List<String> selectedEscalationTypeCodes = testData.getSelectedEscalationTypeCodes();
+        List<EscalationType> escalationTypes = testData.getEscalationTypes();
+
+        // Mock response from compliance client
+        EscalationTypes escalationTypesResponse = new EscalationTypes(escalationTypes);
+        ResponseEntity<EscalationTypes> responseEntity = mock(ResponseEntity.class);
+        when(responseEntity.getBody()).thenReturn(escalationTypesResponse);
+        when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
+
+        // Call the method to be tested
+        List<String> result = complianceService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
+
+        // Assertions
+        assertEquals(1, result.size());
+        assertTrue(result.contains("Escalation 1"));
+        assertFalse(result.contains("Escalation 2"));
+    }
+
+    // Helper class to map JSON data
+    static class TestData {
+        private List<String> selectedEscalationTypeCodes;
+        private List<EscalationType> escalationTypes;
+
+        public List<String> getSelectedEscalationTypeCodes() {
+            return selectedEscalationTypeCodes;
+        }
+
+        public List<EscalationType> getEscalationTypes() {
+            return escalationTypes;
+        }
+    }
+}
