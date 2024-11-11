@@ -72,3 +72,30 @@ public void should_return_empty_list_when_escalation_types_are_null() throws IOE
     // Then
     assertThat(result).isEmpty();
 }
+@Cacheable(cacheNames = ESCALATION_TYPES_CACHE_NAME)
+public List<String> getEscalationTypesFromComplianceSummary(List<String> selectedEscalationTypeCodes) {
+    if (ObjectUtils.isEmpty(selectedEscalationTypeCodes)) {
+        return Collections.emptyList();
+    }
+
+    // Fetch escalation types from the ComplianceClient
+    ResponseEntity<EscalationTypes> responseEntity = this.tradeFinanceComplianceClient.getEscalationTypes();
+    
+    if (responseEntity == null || responseEntity.getBody() == null) {
+        return Collections.emptyList();
+    }
+
+    // Extract escalation types
+    EscalationTypes escalationTypes = responseEntity.getBody();
+    List<EscalationType> escalationTypeList = escalationTypes.getEscalationTypes();
+
+    if (ObjectUtils.isEmpty(escalationTypeList)) {
+        return Collections.emptyList();
+    }
+
+    // Filter and map escalation types to their names
+    return escalationTypeList.stream()
+            .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
+            .map(EscalationType::getName)
+            .collect(Collectors.toList());
+}
