@@ -178,26 +178,27 @@ public class TradefinanceComplianceClientService implements TradeFinanceComplian
 }
 
 
+
+
+
 @Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-    // Read ComplianceResponseInfo from JSON (used for input)
+void should_return_list_of_filtered_selected_escalation_types() throws IOException {
+    // Read selected escalation type codes from a mock JSON file (used for input)
     String complianceResponseJsonFilePath = "src/test/resources/complianceResponseInfo.json";
     ObjectMapper objectMapper = new ObjectMapper();
-    ComplianceResponseInfo expected = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
-
-    // Extract the list of selected escalation type codes
-    List<String> selectedEscalationTypeCodes = expected.getEscalationTypes();
+    ComplianceResponseInfo complianceResponseInfo = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
+    List<String> selectedEscalationTypeCodes = complianceResponseInfo.getEscalationTypes();
 
     // Read escalation types from JSON (used for mock response)
     String escalationTypesJsonFilePath = "src/test/resources/escalationTypes.json";
     EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
 
-    // Mock response from tradeFinanceComplianceClient
+    // Mock the response from tradeFinanceComplianceClient
     ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
     when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
 
     // When
-    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
+    List<String> result = tradefinanceComplianceClientCacheService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
 
     // Construct the expected result by filtering based on selected type codes
     List<String> expectedResult = escalationTypes.getEscalationTypes()
