@@ -1,323 +1,47 @@
-package com.sgcib.digitrade.reporting.domain.compliancesummary;
+package com.sgcib.digitrade.reporting.infrastructure.client.tradefinancecompliance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sgcib.digitrade.reporting.domain.complianceresponse.ComplianceResponseAttachment;
-import com.sgcib.digitrade.reporting.domain.complianceresponse.ComplianceResponseInfo;
+import com.sgcib.digitrade.reporting.infrastructure.client.tradefinancecompliance.dto.EscalationType;
 import com.sgcib.digitrade.reporting.infrastructure.client.tradefinancecompliance.dto.EscalationTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class ComplianceSummaryTemplateHelperServiceTest {
+public class TradefinanceComplianceClientCacheServiceTest {
 
-    @Mock
+    private TradeFinanceComplianceClient tradeFinanceComplianceClient;
     private TradefinanceComplianceClientCacheService tradefinanceComplianceClientCacheService;
-
-    @InjectMocks
-    private ComplianceSummaryTemplateHelperService complianceSummaryTemplateHelperService;
-
-    private static final String CET_TIMEZONE = "CET";
 
     @BeforeEach
     public void setUp() {
-        // Set the default time zone for consistency in date-related tests
-        TimeZone.setDefault(TimeZone.getTimeZone(CET_TIMEZONE));
+        tradeFinanceComplianceClient = mock(TradeFinanceComplianceClient.class);
+        tradefinanceComplianceClientCacheService = new TradefinanceComplianceClientCacheService(tradeFinanceComplianceClient);
     }
 
     @Test
-    void should_return_emptyList_when_inputList_is_empty() throws IOException {
+    public void should_return_list_of_all_the_selected_escalation_types() {
         // Given
-        List<String> escalationTypesResult = Collections.emptyList();
+        List<String> selectedEscalationTypeCodes = Arrays.asList("CODE1", "CODE3");
 
-        ComplianceResponseInfo expected = ComplianceResponseInfo.builder()
-                .status("APPROVED")
-                .attachment(ComplianceResponseAttachment.builder()
-                        .id(1L)
-                        .name("filename.pdf")
-                        .build())
-                .comment("comment")
-                .escalationNecessary(true)
-                .escalationTypes(escalationTypesResult)
-                .build();
+        EscalationType type1 = new EscalationType("CODE1", "Type 1");
+        EscalationType type2 = new EscalationType("CODE2", "Type 2");
+        EscalationType type3 = new EscalationType("CODE3", "Type 3");
 
-        String jsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
-        ObjectMapper objectMapper = new ObjectMapper();
-        EscalationTypes escalationTypes = objectMapper.readValue(new File(jsonFilePath), EscalationTypes.class);
-
-        // Mock the response of the client service
-        when(tradefinanceComplianceClientCacheService.getEscalationTypes()).thenReturn(ResponseEntity.ok(escalationTypes));
+        EscalationTypes escalationTypes = new EscalationTypes(Arrays.asList(type1, type2, type3));
+        when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(ResponseEntity.ok(escalationTypes));
 
         // When
-        List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+        List<String> result = tradefinanceComplianceClientCacheService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
 
         // Then
-        assertEquals(escalationTypesResult, result);
+        assertEquals(2, result.size());
+        assertEquals(Arrays.asList("Type 1", "Type 3"), result);
     }
-}
-
-
-
-
-@Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-    // Read ComplianceResponseInfo from JSON
-    String complianceResponseJsonFilePath = "src/test/resources/complianceResponseInfo.json";
-    ObjectMapper objectMapper = new ObjectMapper();
-    ComplianceResponseInfo expected = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
-
-    // Read escalation types from JSON (used for mock response)
-    String escalationTypesJsonFilePath = "src/test/resources/escalationTypes.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
-
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-
-    // When
-    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
-
-    // Construct the expected result directly from JSON data
-    List<String> expectedResult = escalationTypes.getEscalationTypes()
-            .stream()
-            .map(EscalationType::getName)
-            .collect(Collectors.toList());
-
-    // Then
-    assertEquals(expectedResult, result);
-}
-
-
-
-
-@Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-
-    // Given: Prepare the expected response object from the JSON file
-    String jsonFilePath = "src/test/resources/compliancesummary/compliance-response-info.json";
-    ObjectMapper objectMapper = new ObjectMapper();
-    
-    // Read ComplianceResponseInfo from the JSON file
-    ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
-    
-    // Mock data for escalation types
-    String escalationTypesJsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    
-    // Mocking the service response
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-    
-    // Expected result (moved to Given section)
-    List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
-
-    // When: Call the method under test
-    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
-    
-    // Then: Verify the result matches the expected list of escalation types
-    assertEquals(expectedResult, result);
-}
-
-
-{
-  "status": "APPROVED",
-  "attachment": {
-    "id": 1,
-    "name": "filename.pdf"
-  },
-  "comment": "comment",
-  "escalationNecessary": true,
-  "escalationTypes": [
-    { "id": 1, "name": "AML", "code": "AML" },
-    { "id": 2, "name": "CSR", "code": "CSR" },
-    { "id": 3, "name": "Sanction and Embargo", "code": "SACTION_AND_EMBARGO" }
-  ]
-}
-
-
-
-@Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-
-    // Given
-    String jsonFilePath = "src/test/resources/compliancesummary/compliance-response-info.json";
-
-    // Use ObjectMapper to deserialize the JSON file into ComplianceResponseInfo
-    ObjectMapper objectMapper = new ObjectMapper();
-    ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
-
-    // Print expected escalation types for debugging
-    System.out.println("Expected Escalation Types: " + expected.getEscalationTypes());
-
-    // Mock the response to return the deserialized escalationTypes object
-    String escalationTypesJsonPath = "src/test/resources/compliancesummary/escalation-types.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonPath), EscalationTypes.class);
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-
-    // When
-    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
-
-    // Print actual result for debugging
-    System.out.println("Actual Result: " + result);
-
-    List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
-
-    // Then
-    assertEquals(expectedResult, result);
-}
-
-
-
-@Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-
-    // Given
-    String jsonFilePath = "src/test/resources/compliancesummary/compliance-response-info.json";
-
-    // Use ObjectMapper to deserialize the JSON file into ComplianceResponseInfo
-    ObjectMapper objectMapper = new ObjectMapper();
-    ComplianceResponseInfo expected = objectMapper.readValue(new File(jsonFilePath), ComplianceResponseInfo.class);
-
-    // Mock the response to return the deserialized escalationTypes object
-    String escalationTypesJsonPath = "src/test/resources/compliancesummary/escalation-types.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonPath), EscalationTypes.class);
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-
-    // When
-    List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
-    List<String> expectedResult = Arrays.asList("AML", "CSR", "Sanction and Embargo");
-
-    // Then
-    assertEquals(expectedResult, result);
-}
-
-
-
-
-
-
-
-
-
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.util.CollectionUtils;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-public class TradefinanceComplianceClientService implements TradeFinanceComplianceClientService {
-
-    private final TradeFinanceComplianceClient tradeFinanceComplianceClient;
-
-    // Constructor injection for better testability and immutability
-    public TradefinanceComplianceClientService(TradeFinanceComplianceClient tradeFinanceComplianceClient) {
-        this.tradeFinanceComplianceClient = tradeFinanceComplianceClient;
-    }
-
-    @Override
-    @Cacheable(cacheNames = ESCALATION_TYPES_CACHE_NAME)
-    public List<String> getEscalationTypesFromComplianceSummary(List<String> selectedEscalationTypeCodes) {
-        // Validate input early
-        if (CollectionUtils.isEmpty(selectedEscalationTypeCodes)) {
-            return Collections.emptyList();
-        }
-
-        // Fetch escalation types from the client and handle nulls safely
-        return Optional.ofNullable(tradeFinanceComplianceClient.getEscalationTypes())
-                .map(ResponseEntity::getBody) // Check if the response body is not null
-                .map(EscalationTypes::getEscalationTypes) // Check if the `EscalationTypes` contains the list
-                .filter(escalationTypes -> !CollectionUtils.isEmpty(escalationTypes)) // Filter out if the list is null or empty
-                .map(escalationTypes -> escalationTypes.stream()
-                        .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode())) // Match selected codes
-                        .map(EscalationType::getName) // Extract names
-                        .collect(Collectors.toList()) // Collect into a list
-                )
-                .orElse(Collections.emptyList()); // Fallback if any part of the chain returns null or empty
-    }
-}
-
-
-
-
-
-@Test
-void should_return_list_of_filtered_selected_escalation_types() throws IOException {
-    // Read selected escalation type codes from a mock JSON file (used for input)
-    String complianceResponseJsonFilePath = "src/test/resources/complianceResponseInfo.json";
-    ObjectMapper objectMapper = new ObjectMapper();
-    ComplianceResponseInfo complianceResponseInfo = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
-    List<String> selectedEscalationTypeCodes = complianceResponseInfo.getEscalationTypes();
-
-    // Read escalation types from JSON (used for mock response)
-    String escalationTypesJsonFilePath = "src/test/resources/escalationTypes.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
-
-    // Mock the response from tradeFinanceComplianceClient
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-
-    // When
-    List<String> result = tradefinanceComplianceClientCacheService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
-
-    // Construct the expected result by filtering based on selected type codes
-    List<String> expectedResult = escalationTypes.getEscalationTypes()
-            .stream()
-            .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
-            .map(EscalationType::getName)
-            .collect(Collectors.toList());
-
-    // Then
-    assertEquals(expectedResult, result);
-}
-
-
-
-
-
-@Test
-void should_return_list_of_all_the_selected_escalation_types() throws IOException {
-    // Initialize ObjectMapper for reading JSON
-    ObjectMapper objectMapper = new ObjectMapper();
-
-    // Read ComplianceResponseInfo from JSON for input
-    String complianceResponseJsonFilePath = "src/test/resources/complianceResponseInfo.json";
-    ComplianceResponseInfo complianceResponseInfo = objectMapper.readValue(new File(complianceResponseJsonFilePath), ComplianceResponseInfo.class);
-    List<String> selectedEscalationTypeCodes = complianceResponseInfo.getEscalationTypes();
-
-    // Read escalation types from JSON for mock response
-    String escalationTypesJsonFilePath = "src/test/resources/escalationTypes.json";
-    EscalationTypes escalationTypes = objectMapper.readValue(new File(escalationTypesJsonFilePath), EscalationTypes.class);
-
-    // Mock the response from tradeFinanceComplianceClient
-    ResponseEntity<EscalationTypes> responseEntity = ResponseEntity.ok(escalationTypes);
-    when(tradeFinanceComplianceClient.getEscalationTypes()).thenReturn(responseEntity);
-
-    // Call the method under test
-    List<String> result = tradefinanceComplianceClientCacheService.getEscalationTypesFromComplianceSummary(selectedEscalationTypeCodes);
-
-    // Construct the expected result by filtering escalation types based on selected codes
-    List<String> expectedResult = escalationTypes.getEscalationTypes()
-            .stream()
-            .filter(escalationType -> selectedEscalationTypeCodes.contains(escalationType.getCode()))
-            .map(EscalationType::getName)
-            .collect(Collectors.toList());
-
-    // Assert the result matches the expected result
-    assertEquals(expectedResult, result);
 }
