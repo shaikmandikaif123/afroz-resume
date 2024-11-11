@@ -1,3 +1,78 @@
+package com.sgcib.digitrade.reporting.domain.compliancesummary;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sgcib.digitrade.reporting.domain.complianceresponse.ComplianceResponseAttachment;
+import com.sgcib.digitrade.reporting.domain.complianceresponse.ComplianceResponseInfo;
+import com.sgcib.digitrade.reporting.infrastructure.client.tradefinancecompliance.dto.EscalationTypes;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ComplianceSummaryTemplateHelperServiceTest {
+
+    @Mock
+    private TradefinanceComplianceClientCacheService tradefinanceComplianceClientCacheService;
+
+    @InjectMocks
+    private ComplianceSummaryTemplateHelperService complianceSummaryTemplateHelperService;
+
+    private static final String CET_TIMEZONE = "CET";
+
+    @BeforeEach
+    public void setUp() {
+        // Set the default time zone for consistency in date-related tests
+        TimeZone.setDefault(TimeZone.getTimeZone(CET_TIMEZONE));
+    }
+
+    @Test
+    void should_return_emptyList_when_inputList_is_empty() throws IOException {
+        // Given
+        List<String> escalationTypesResult = Collections.emptyList();
+
+        ComplianceResponseInfo expected = ComplianceResponseInfo.builder()
+                .status("APPROVED")
+                .attachment(ComplianceResponseAttachment.builder()
+                        .id(1L)
+                        .name("filename.pdf")
+                        .build())
+                .comment("comment")
+                .escalationNecessary(true)
+                .escalationTypes(escalationTypesResult)
+                .build();
+
+        String jsonFilePath = "src/test/resources/compliancesummary/escalation-types.json";
+        ObjectMapper objectMapper = new ObjectMapper();
+        EscalationTypes escalationTypes = objectMapper.readValue(new File(jsonFilePath), EscalationTypes.class);
+
+        // Mock the response of the client service
+        when(tradefinanceComplianceClientCacheService.getEscalationTypes()).thenReturn(ResponseEntity.ok(escalationTypes));
+
+        // When
+        List<String> result = complianceSummaryTemplateHelperService.getEscalationTypesFromComplianceSummary(expected.getEscalationTypes());
+
+        // Then
+        assertEquals(escalationTypesResult, result);
+    }
+}
+
+
+
+
 @Test
 void should_return_list_of_all_the_selected_escalation_types() throws IOException {
     // Read ComplianceResponseInfo from JSON
