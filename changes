@@ -41,3 +41,30 @@ describe('NavbarComponent', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith([route]);
   });
 });
+
+
+
+
+
+public List<String> getEscalationTypesFromComplianceSummary() {
+    // Fetch escalation types from the compliance client
+    ResponseEntity<EscalationTypes> responseEntity = this.tradeFinanceComplianceClient.getEscalationTypes();
+
+    if (responseEntity != null) {
+        // Ensure the body is not null and extract escalation types
+        List<EscalationType> escalationTypes = Objects.requireNonNull(responseEntity.getBody()).getEscalationTypes();
+
+        if (escalationTypes != null) {
+            // Stream escalation types to extract names directly
+            return escalationTypes.stream()
+                .map(EscalationType::getName) // Extract names
+                .collect(Collectors.toList());
+        } else {
+            // Return an empty list if escalationTypes is null
+            return Collections.emptyList();
+        }
+    } else {
+        // Return an empty list if the responseEntity is null
+        return Collections.emptyList();
+    }
+}
