@@ -43,7 +43,23 @@ describe('NavbarComponent', () => {
 });
 
 
+public List<String> getEscalationTypesFromComplianceSummary() {
+    // Fetch the list of escalation type names from the client service
+    ResponseEntity<List<String>> responseEntity = this.tradeFinanceComplianceClient.getEscalationTypes();
 
+    if (responseEntity != null) {
+        // Ensure the body is not null and return it
+        List<String> escalationTypeNames = responseEntity.getBody();
+
+        if (escalationTypeNames != null) {
+            return escalationTypeNames; // Return the list of names
+        } else {
+            return Collections.emptyList(); // Return an empty list if body is null
+        }
+    } else {
+        return Collections.emptyList(); // Return an empty list if responseEntity is null
+    }
+}
 
 
 public List<String> getEscalationTypesFromComplianceSummary() {
