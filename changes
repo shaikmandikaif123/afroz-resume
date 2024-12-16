@@ -87,3 +87,86 @@ public List<String> getEscalationTypesFromComplianceSummary() {
 
 
 I need clarity on a few points, Sushma. First, my probation is supposed to end in December, but you mentioned that I will be relieved from Digitrade in January. Second, I received a call from the 'CIO Ref' team regarding a requirement. They mentioned that I can only switch teams after completing 18 months of experience in SG. They also suggested I connect with my seniors regarding this."
+
+
+
+
+
+
+
+package com.sgcib.digitrade.reporting.domain.complianceresponse;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ComplianceResponseInfoTest {
+
+    @Test
+    void testIsApproved() {
+        // Given: ComplianceResponseInfo object with status "APPROVED"
+        ComplianceResponseInfo response = ComplianceResponseInfo.builder()
+                .status("APPROVED")
+                .build();
+
+        // When: Calling isApproved
+        boolean result = response.isApproved();
+
+        // Then: It should return true
+        assertTrue(result);
+
+        // And: isRejected should return false
+        assertFalse(response.isRejected());
+    }
+
+    @Test
+    void testIsRejected() {
+        // Given: ComplianceResponseInfo object with status "REJECTED"
+        ComplianceResponseInfo response = ComplianceResponseInfo.builder()
+                .status("REJECTED")
+                .build();
+
+        // When: Calling isRejected
+        boolean result = response.isRejected();
+
+        // Then: It should return true
+        assertTrue(result);
+
+        // And: isApproved should return false
+        assertFalse(response.isApproved());
+    }
+
+    @Test
+    void testIsApprovedAndIsRejectedForOtherStatuses() {
+        // Given: ComplianceResponseInfo object with a different status
+        ComplianceResponseInfo response = ComplianceResponseInfo.builder()
+                .status("PENDING")
+                .build();
+
+        // When: Calling isApproved and isRejected
+        boolean isApproved = response.isApproved();
+        boolean isRejected = response.isRejected();
+
+        // Then: Both should return false
+        assertFalse(isApproved);
+        assertFalse(isRejected);
+    }
+
+    @Test
+    void testBuilderInitialization() {
+        // Given: Sample data for ComplianceResponseInfo
+        ComplianceResponseAttachment attachment = new ComplianceResponseAttachment();
+        ComplianceResponseInfo response = ComplianceResponseInfo.builder()
+                .status("PENDING")
+                .attachment(attachment)
+                .comment("Test comment")
+                .escalationTypes(List.of("TYPE1", "TYPE2"))
+                .build();
+
+        // Then: Fields should match the given data
+        assertEquals("PENDING", response.getStatus());
+        assertEquals(attachment, response.getAttachment());
+        assertEquals("Test comment", response.getComment());
+        assertEquals(List.of("TYPE1", "TYPE2"), response.getEscalationTypes());
+    }
+}
