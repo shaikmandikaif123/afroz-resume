@@ -170,3 +170,91 @@ class ComplianceResponseInfoTest {
         assertEquals(List.of("TYPE1", "TYPE2"), response.getEscalationTypes());
     }
 }
+
+
+
+
+
+
+package com.sgcib.digitrade.reporting.domain.compliancerespo;
+
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+
+class ComplianceResponseAttachmentTest {
+
+    @Test
+    void testLombokGeneratedMethods() {
+        // Create an instance using the builder
+        ComplianceResponseAttachment attachment = ComplianceResponseAttachment.builder()
+                .id(1L)
+                .name("Test Attachment")
+                .content(new byte[]{1, 2, 3})
+                .build();
+
+        // Validate properties
+        assertThat(attachment.getId()).isEqualTo(1L);
+        assertThat(attachment.getName()).isEqualTo("Test Attachment");
+        assertThat(attachment.getContent()).isEqualTo(new byte[]{1, 2, 3});
+
+        // Update properties using setters
+        attachment.setId(2L);
+        attachment.setName("Updated Attachment");
+        attachment.setContent(new byte[]{4, 5, 6});
+
+        // Validate updated properties
+        assertThat(attachment.getId()).isEqualTo(2L);
+        assertThat(attachment.getName()).isEqualTo("Updated Attachment");
+        assertThat(attachment.getContent()).isEqualTo(new byte[]{4, 5, 6});
+    }
+
+    @Test
+    void testNoArgsConstructor() {
+        // Create an instance using the no-args constructor
+        ComplianceResponseAttachment attachment = new ComplianceResponseAttachment();
+
+        // Set properties
+        attachment.setId(10L);
+        attachment.setName("No Args Attachment");
+        attachment.setContent(new byte[]{10, 20, 30});
+
+        // Validate properties
+        assertThat(attachment.getId()).isEqualTo(10L);
+        assertThat(attachment.getName()).isEqualTo("No Args Attachment");
+        assertThat(attachment.getContent()).isEqualTo(new byte[]{10, 20, 30});
+    }
+
+    @Test
+    void testAllArgsConstructor() {
+        // Create an instance using the all-args constructor
+        ComplianceResponseAttachment attachment = new ComplianceResponseAttachment(
+                5L, "All Args Attachment", new byte[]{50, 60, 70});
+
+        // Validate properties
+        assertThat(attachment.getId()).isEqualTo(5L);
+        assertThat(attachment.getName()).isEqualTo("All Args Attachment");
+        assertThat(attachment.getContent()).isEqualTo(new byte[]{50, 60, 70});
+    }
+
+    @Test
+    void testEqualsAndHashCode() {
+        // Create two identical instances
+        ComplianceResponseAttachment attachment1 = new ComplianceResponseAttachment(1L, "Attachment", new byte[]{1, 2, 3});
+        ComplianceResponseAttachment attachment2 = new ComplianceResponseAttachment(1L, "Attachment", new byte[]{1, 2, 3});
+
+        // Validate equality and hashCode
+        assertThat(attachment1).isEqualTo(attachment2);
+        assertThat(attachment1.hashCode()).isEqualTo(attachment2.hashCode());
+
+        // Modify one instance and validate inequality
+        attachment2.setId(2L);
+        assertThat(attachment1).isNotEqualTo(attachment2);
+    }
+
+    @Test
+    void testToString() {
+        // Create an instance and validate its toString representation
+        ComplianceResponseAttachment attachment = new ComplianceResponseAttachment(1L, "Test", new byte[]{1, 2, 3});
+        assertThat(attachment.toString()).contains("ComplianceResponseAttachment(id=1, name=Test, content=[1, 2, 3])");
+    }
+}
