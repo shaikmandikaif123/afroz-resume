@@ -258,3 +258,16 @@ class ComplianceResponseAttachmentTest {
         assertThat(attachment.toString()).contains("ComplianceResponseAttachment(id=1, name=Test, content=[1, 2, 3])");
     }
 }
+
+
+
+
+
+
+
+
+readDocument(file: File): Observable<LCDocument> { 
+  return this.extractJsonFromPdf(file).pipe(
+    map(content => this.formatJsonContentToTextEditorContent(content)) // Format the extracted content
+  );
+}
