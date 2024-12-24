@@ -271,3 +271,7 @@ readDocument(file: File): Observable<LCDocument> {
     map(content => this.formatJsonContentToTextEditorContent(content)) // Format the extracted content
   );
 }
+
+
+
+"Hello Hithashree, I connected with Tousif regarding the Sonar issue. He doesn't have access to mark them as false positives. Can I ask Frederic Coste, 'While committing my changes, I am getting Sonar issues on two fields, such as unused fields. Can you please mark them as false positives?'"
