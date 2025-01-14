@@ -275,3 +275,22 @@ readDocument(file: File): Observable<LCDocument> {
 
 
 "Hello Hithashree, I connected with Tousif regarding the Sonar issue. He doesn't have access to mark them as false positives. Can I ask Frederic Coste, 'While committing my changes, I am getting Sonar issues on two fields, such as unused fields. Can you please mark them as false positives?'"
+
+
+
+
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" 
+     th:fragment="escalation-type-compliance-summary-report">
+
+    <div class="escalation-type-compliance-summary-report" 
+         th:if="${escalationTypes != null && !escalationTypes.isEmpty()}">
+
+        <span class="escalation-section-title">Escalation Type</span>
+
+        <ul class="escalation-types-list">
+            <li th:if="${escalationTypes.contains('sanction and Embargo')}" th:text="'Sanction and Embargo'"></li>
+            <li th:if="${escalationTypes.contains('aml')}" th:text="'AML'"></li>
+            <li th:if="${escalationTypes.contains('csr')}" th:text="'CSR'"></li>
+        </ul>
+    </div>
+</div>
