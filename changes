@@ -328,3 +328,24 @@ public enum EscalationType {
         </ul>
     </div>
 </div>
+
+
+
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" 
+     th:fragment="escalation-type-compliance-summary-report">
+
+    <div class="escalation-type-compliance-summary-report" 
+         th:if="${escalationTypes != null && !escalationTypes.isEmpty()}">
+
+        <span class="escalation-section-title">Escalation Type</span>
+
+        <ul class="escalation-types-list">
+            <li th:if="${escalationTypes.contains(T(com.example.EscalationType).SANCTION_AND_EMBARGO.name())}" 
+                th:text="'Sanction and Embargo'"></li>
+            <li th:if="${escalationTypes.contains(T(com.example.EscalationType).AML.name())}" 
+                th:text="'AML'"></li>
+            <li th:if="${escalationTypes.contains(T(com.example.EscalationType).CSR.name())}" 
+                th:text="'CSR'"></li>
+        </ul>
+    </div>
+</div>
