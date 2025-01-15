@@ -294,3 +294,37 @@ readDocument(file: File): Observable<LCDocument> {
         </ul>
     </div>
 </div>
+
+
+package com.example.enums;
+
+public enum EscalationType {
+    SANCTION_AND_EMBARGO("Sanction and Embargo"),
+    AML("AML"),
+    CSR("CSR");
+
+    private final String displayName;
+
+    EscalationType(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+}
+
+
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+     th:fragment="escalation-type-compliance-summary-report">
+
+    <div class="escalation-type-compliance-summary-report"
+         th:if="${escalationTypes != null && !escalationTypes.isEmpty()}">
+
+        <span class="escalation-section-title">Escalation Type</span>
+
+        <ul class="escalation-types-list">
+            <li th:each="type : ${escalationTypes}" th:text="${type.displayName}"></li>
+        </ul>
+    </div>
+</div>
