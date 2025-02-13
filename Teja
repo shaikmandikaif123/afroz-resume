@@ -1,0 +1,74 @@
+public virtual ActionResult SaveRequestStatus()
+{
+    try
+    {
+        // Deserialize request object
+        var requestStatusJson = Uri.UnescapeDataString(Request.Form["requestStatusObject"]);
+        var requestStatusObject = JsonConvert.DeserializeObject<RequestContextMessage>(
+            requestStatusJson,
+            new JsonSerializerSettings { Culture = CultureInfo.InvariantCulture, StringEscapeHandling = StringEscapeHandling.EscapeHtml }
+        );
+
+        // Set Selected Elementary Counterpart
+        requestStatusObject.LineInformationMessage.SelectedElementary =
+            requestStatusObject.LineInformationMessage.ElementaryCounterpart[
+                requestStatusObject.LineInformationMessage.SelectedElementary
+            ].IdCounterpart;
+
+        // Retrieve user activity code and profile
+        var user = (HttpContext.User as Gtps.Tomtra.Mvc.Security.TomtraPrincipal)?.LoginUser;
+        if (user != null)
+        {
+            requestStatusObject.OperationInformationMessage.GeneralInformation.ActivityCode = user.ActivityCode?.FirstOrDefault();
+            requestStatusObject.OperationInformationMessage.GeneralInformation.IdProfile = user.UserProfile.IdProfile;
+        }
+
+        // Set Islmex flag
+        requestStatusObject.Islmex =
+            requestStatusObject.OperationInformationMessage.GeneralInformation.IsImexVersion ?? false;
+
+        // Save request status using service
+        var requestService = provider.Resolve<IRequestService>();
+        requestService.SaveRequestStatus(requestStatusObject);
+
+        // Return success response
+        return Json(new
+        {
+            idRequest = requestStatusObject.IdRequest,
+            idVersion = requestStatusObject.IdVersion,
+            requestStatus = requestStatusObject.OperationInformationMessage.GeneralInformation.RequestStatus,
+            operationStatus = requestStatusObject.OperationInformationMessage.GeneralInformation.OperationStatus,
+            startDate = requestStatusObject.OperationInformationMessage.GeneralInformation.OperationStatus == "OPE"
+                ? DateTime.Today.ToString("yyyy-MM-dd")
+                : requestStatusObject.OperationInformationMessage.GeneralInformation.StartDate.ToString("yyyy-MM-dd"),
+            promiseValidityDate = (requestStatusObject.OperationInformationMessage.GeneralInformation.RequestStatus == "RIP" &&
+                                   requestStatusObject.OperationInformationMessage.GeneralInformation.IdNature == 1)
+                ? DateTime.Today.AddMonths(1).ToString("yyyy-MM-dd")
+                : requestStatusObject.OperationInformationMessage.GeneralInformation.PromiseValidityDate.ToString("yyyy-MM-dd"),
+            requestPath = requestStatusObject.OperationInformationMessage.GeneralInformation.RequestStatus != "VAL"
+                ? $"Request {requestStatusObject.IdRequest}-{requestStatusObject.IdVersion:000}"
+                : $"Operation {requestStatusObject.IdRequest}",
+            warnings = requestStatusObject.Warnings,
+            informations = requestStatusObject.Informations
+        });
+    }
+    catch (TomtraException ex)
+    {
+        var dataConcurrencyError = ex.Data["DataConcurrencyError"] as string;
+
+        if (!string.IsNullOrEmpty(dataConcurrencyError))
+        {
+            return Json(new
+            {
+                error = "Data concurrency error",
+                details = dataConcurrencyError
+            });
+        }
+
+        return JsonErrorResult(ex.Data["Errors"] as List<string>);
+    }
+    catch (Exception ex)
+    {
+        return JsonErrorResult(new List<string> { "An unexpected error occurred.", ex.Message });
+    }
+}
