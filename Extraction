@@ -1,0 +1,40 @@
+SELECT 
+    e.entity_label AS subsidiary,
+    TO_CHAR(cnt.created_date, 'YYYY-MM') AS month,
+    
+    -- Count of validated Digitrade steps
+    COUNT(CASE WHEN cnt.status_code = 'VALIDATED' THEN 1 END) AS validated_steps,
+    
+    -- Count of escalations to Compliance with "Approved" response
+    COUNT(CASE WHEN cnt.status_code = 'VALIDATED' AND cnt.response_status = 'APPROVED' THEN 1 END) AS approved_escalations,
+    
+    -- Count of escalations to Compliance with "Rejected" response
+    COUNT(CASE WHEN cnt.status_code = 'VALIDATED' AND cnt.response_status = 'REJECTED' THEN 1 END) AS rejected_escalations
+
+FROM trade_finance_compliance_management.deals d
+INNER JOIN trade_finance_compliance_management.steps s 
+    ON d.id = s.deal_id
+INNER JOIN trade_finance_compliance_management.step_controls cnt 
+    ON cnt.step_id = s.id 
+    AND cnt.is_active = TRUE
+INNER JOIN trade_finance_compliance_management.oper_steps oper 
+    ON oper.id = s.id
+INNER JOIN access_management.entity e 
+    ON e.code = d.entity_code
+INNER JOIN access_management.entity_department_extraction_info ed 
+    ON ed.entity_id = e.id
+
+-- Filter only required subsidiaries
+WHERE e.entity_label IN ('SG Cameroun', 'SG Senegal', 'SG Ivory Coast')
+
+-- Filter for the required time range
+AND cnt.created_date BETWEEN '2024-01-01' AND '2025-01-31'
+
+-- Consider only Trade Finance products
+AND d.business_line_id = 2
+
+-- Group data by subsidiary and month
+GROUP BY e.entity_label, TO_CHAR(cnt.created_date, 'YYYY-MM')
+
+-- Order results by subsidiary and month
+ORDER BY e.entity_label, month;
