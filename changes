@@ -1,3 +1,33 @@
+🤣
+
+SELECT 
+    rr.id AS role_id,
+    rr.code AS role_code,
+    rr.role_id,
+    rr.is_admin,
+    rr.business_line_id AS role_business_line_id,
+    rr.`order`,
+    
+    e.id AS entity_id,
+    e.code AS entity_code,
+    e.label AS entity_label,
+    e.business_line_id AS entity_business_line_id,
+
+    rp.permission_id
+FROM rtfe_role rr
+LEFT JOIN rtfe_role_entity rre 
+    ON rr.id = rre.rtfe_role_id
+LEFT JOIN entity e 
+    ON rre.entity_id = e.id
+LEFT JOIN rtfe_role_permission rp 
+    ON rr.id = rp.rtfe_role_id
+WHERE rr.id = <YOUR_ROLE_ID>;
+
+
+
+
+
+
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UserService } from '../Services/user.service';
